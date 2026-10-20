@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تسجيل دوام العمال</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #27ae60;
+            --danger-color: #c0392b;
+            --bg-color: #f8f9fa;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h2, h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .danger-btn {
+            background-color: var(--danger-color);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>سجل دوام العمال الشهري</h2>
+
+    <!-- قسم إضافة عامل جديد -->
+    <div class="section">
+        <h3>إضافة عامل جديد</h3>
+        <div class="form-group">
+            <label for="workerName">اسم العامل:</label>
+            <input type="text" id="workerName" placeholder="أدخل اسم العامل">
+        </div>
+        <div class="form-group">
+            <label for="dailyWage">الأجر اليومي:</label>
+            <input type="number" id="dailyWage" placeholder="أدخل الأجر اليومي">
+        </div>
+        <button onclick="addWorker()">إضافة العامل</button>
+    </div>
+
+    <!-- قسم تسجيل الحضور والغياب اليومي -->
+    <div class="section">
+        <h3>تسجيل الدوام اليومي</h3>
+        <div class="form-group">
+            <label for="selectWorker">اختر العامل:</label>
+            <select id="selectWorker"></select>
+        </div>
+        <div class="form-group">
+            <label for="workStatus">الحالة:</label>
+            <select id="workStatus">
+                <option value="1">حاضر (يوم كامل)</option>
+                <option value="0.5">نصف يوم</option>
+                <option value="0">غائب</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="recordDate">التاريخ:</label>
+            <input type="date" id="recordDate">
+        </div>
+        <button onclick="recordAttendance()">حفظ التسجيل</button>
+    </div>
+
+    <!-- قسم التقارير الشهرية -->
+    <div class="section">
+        <h3>التقرير الشهري وملخص الحسابات</h3>
+        <table id="reportTable">
+            <thead>
+                <tr>
+                    <th>اسم العامل</th>
+                    <th>الأجر اليومي</th>
+                    <th>أيام العمل المحسوبة</th>
+                    <th>إجمالي المستحق</th>
+                    <th>إدارة</th>
+                </tr>
+            </thead>
+            <tbody id="reportTableBody">
+                <!-- سيتم تعبئتها تلقائياً -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // تحميل البيانات من الذاكرة المحلية أو البدء بمصفوفات فارغة
+    let workers = JSON.parse(localStorage.getItem('workers')) || [];
+    let attendance = JSON.parse(localStorage.getItem('attendance')) || [];
+
+    // تعيين تاريخ اليوم افتراضياً في حقل التاريخ
+    document.getElementById('recordDate').valueAsDate = new Date();
+
+    function saveData() {
+        localStorage.setItem('workers', JSON.stringify(workers));
+        localStorage.setItem('attendance', JSON.stringify(attendance));
+    }
+
+    function addWorker() {
+        const name = document.getElementById('workerName').value.trim();
+        const wage = parseFloat(document.getElementById('dailyWage').value);
+
+        if (!name || isNaN(wage) || wage <= 0) {
+            alert('الرجاء إدخال اسم صحيح وأجر يومي صالح.');
+            return;
+        }
+
+        workers.push({ id: Date.now(), name: name, wage: wage });
+        document.getElementById('workerName').value = '';
+        document.getElementById('dailyWage').value = '';
+        
+        saveData();
+        updateUI();
+        alert('تمت إضافة العامل بنجاح!');
+    }
+
+    function recordAttendance() {
+        const workerId = document.getElementById('selectWorker').value;
+        const status = parseFloat(document.getElementById('workStatus').value);
+        const date = document.getElementById('recordDate').value;
+
+        if (!workerId || !date) {
+            alert('الرجاء اختيار العامل وتحديد التاريخ.');
+            return;
+        }
+
+        // التحقق إذا تم تسجيل نفس اليوم لنفس العامل مسبقاً لتحديثه بدلاً من تكراره
+        const existingIndex = attendance.findIndex(item => item.workerId == workerId && item.date == date);
+        if (existingIndex > -1) {
+            attendance[existingIndex].status = status;
+        } else {
+            attendance.push({ workerId: workerId, status: status, date: date });
+        }
+
+        saveData();
+        updateUI();
+        alert('تم حفظ الدوام بنجاح!');
+    }
+
+    function deleteWorker(id) {
+        if (confirm('هل أنت متأكد من حذف هذا العامل وكل سجلات دوامه؟')) {
+            workers = workers.filter(w => w.id != id);
+            attendance = attendance.filter(a => a.workerId != id);
+            saveData();
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        // تحديث قائمة العمال المنسدلة
+        const select = document.getElementById('selectWorker');
+        select.innerHTML = '';
+        workers.forEach(w => {
+            let option = document.createElement('option');
+            option.value = w.id;
+            option.textContent = w.name;
+            select.appendChild(option);
+        });
+
+        // تحديث جدول التقارير
+        const tbody = document.getElementById('reportTableBody');
+        tbody.innerHTML = '';
+
+        workers.forEach(w => {
+            // حساب مجموع أيام العمل لهذا العامل
+            const workerRecords = attendance.filter(a => a.workerId == w.id);
+            const totalDays = workerRecords.reduce((sum, record) => sum + record.status, 0);
+            const totalAmount = totalDays * w.wage;
+
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${w.name}</td>
+                <td>${w.wage}</td>
+                <td>${totalDays}</td>
+                <td>${totalAmount}</td>
+                <td><button class="danger-btn" onclick="deleteWorker(${w.id})">حذف</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // تشغيل التحديث عند فتح الصفحة
+    updateUI();
+</script>
+
+</body>
+</html>
