@@ -3,160 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام تسجيل دوام العمال</title>
+    <title>El Hasan - نظام متابعة دوام العمال</title>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #27ae60;
-            --danger-color: #c0392b;
-            --bg-color: #f8f9fa;
+            --primary-color: #1e293b;
+            --accent-color: #0d9488;
+            --present-color: #22c55e;
+            --half-color: #f59e0b;
+            --absent-color: #ef4444;
+            --bg-color: #f8fafc;
         }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
-            color: #333;
+            color: #334155;
         }
+
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
-            background: #fff;
-            padding: 20px;
+            background: #ffffff;
+            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
-        h2, h3 {
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
             color: var(--primary-color);
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
+            font-size: 28px;
+            letter-spacing: 1px;
         }
+
+        .header p {
+            margin: 5px 0 0 0;
+            color: #64748b;
+            font-weight: bold;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: #f1f5f9;
+            padding: 18px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid #cbd5e1;
+            padding-bottom: 8px;
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            font-size: 14px;
         }
+
         input, select {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 16px;
+            font-size: 15px;
         }
-        button {
-            background-color: var(--secondary-color);
+
+        .btn {
+            background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
+            width: 100%;
+            transition: background 0.2s;
         }
-        button:hover {
+
+        .btn:hover {
             opacity: 0.9;
         }
-        .danger-btn {
-            background-color: var(--danger-color);
+
+        .btn-print {
+            background-color: #0284c7;
+            margin-top: 10px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+
+        .btn-danger {
+            background-color: var(--absent-color);
+            padding: 5px 10px;
+            width: auto;
+            font-size: 13px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
+
+        /* تنسيق تقويم الشهر */
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .day-box {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px 5px;
             text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
         }
-        th {
-            background-color: var(--primary-color);
-            color: white;
+
+        .day-box .num {
+            font-weight: bold;
+            font-size: 16px;
+            display: block;
         }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+
+        .day-box .status-lbl {
+            font-size: 11px;
+            margin-top: 4px;
+            display: block;
         }
-        .section {
-            margin-bottom: 30px;
+
+        /* ألوان الحضور والغياب */
+        .day-present {
+            background-color: #dcfce7 !important;
+            border-color: var(--present-color) !important;
+            color: #15803d;
+        }
+
+        .day-half {
+            background-color: #fef3c7 !important;
+            border-color: var(--half-color) !important;
+            color: #b45309;
+        }
+
+        .day-absent {
+            background-color: #fee2e2 !important;
+            border-color: var(--absent-color) !important;
+            color: #b91c1c;
+        }
+
+        /* ملخص الحسابات */
+        .summary-box {
+            display: flex;
+            justify-content: space-between;
+            background: #e2e8f0;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* تنسيقات خاصة بالطباعة */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .no-print, .grid-2 {
+                display: none !important;
+            }
+            .calendar-grid {
+                gap: 4px;
+            }
+            .day-box {
+                border: 1px solid #999 !important;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>سجل دوام العمال الشهري</h2>
-
-    <!-- قسم إضافة عامل جديد -->
-    <div class="section">
-        <h3>إضافة عامل جديد</h3>
-        <div class="form-group">
-            <label for="workerName">اسم العامل:</label>
-            <input type="text" id="workerName" placeholder="أدخل اسم العامل">
-        </div>
-        <div class="form-group">
-            <label for="dailyWage">الأجر اليومي:</label>
-            <input type="number" id="dailyWage" placeholder="أدخل الأجر اليومي">
-        </div>
-        <button onclick="addWorker()">إضافة العامل</button>
+    <!-- الهيدر باسم الشركة -->
+    <div class="header">
+        <h1>El Hasan Furniture & Steel</h1>
+        <p>مؤسسة الحسن - نظام متابعة ودوام العمال الشهري</p>
     </div>
 
-    <!-- قسم تسجيل الحضور والغياب اليومي -->
-    <div class="section">
-        <h3>تسجيل الدوام اليومي</h3>
-        <div class="form-group">
-            <label for="selectWorker">اختر العامل:</label>
-            <select id="selectWorker"></select>
+    <!-- قسم الإضافة والإدارة (يختفي في الطباعة) -->
+    <div class="grid-2 no-print">
+        <!-- إضافة عامل -->
+        <div class="card">
+            <h3>إضافة عامل جديد</h3>
+            <div class="form-group">
+                <label for="workerName">اسم العامل:</label>
+                <input type="text" id="workerName" placeholder="مثال: أحمد محمود">
+            </div>
+            <div class="form-group">
+                <label for="dailyWage">الأجر اليومي:</label>
+                <input type="number" id="dailyWage" placeholder="أدخل الأجر باليوم">
+            </div>
+            <button class="btn" onclick="addWorker()">إضافة العامل</button>
         </div>
-        <div class="form-group">
-            <label for="workStatus">الحالة:</label>
-            <select id="workStatus">
-                <option value="1">حاضر (يوم كامل)</option>
-                <option value="0.5">نصف يوم</option>
-                <option value="0">غائب</option>
-            </select>
+
+        <!-- قائمة العمال الحاليين -->
+        <div class="card">
+            <h3>إدارة قائمة العمال</h3>
+            <div id="workersList" style="max-height: 150px; overflow-y: auto;"></div>
         </div>
-        <div class="form-group">
-            <label for="recordDate">التاريخ:</label>
-            <input type="date" id="recordDate">
-        </div>
-        <button onclick="recordAttendance()">حفظ التسجيل</button>
     </div>
 
-    <!-- قسم التقارير الشهرية -->
-    <div class="section">
-        <h3>التقرير الشهري وملخص الحسابات</h3>
-        <table id="reportTable">
-            <thead>
-                <tr>
-                    <th>اسم العامل</th>
-                    <th>الأجر اليومي</th>
-                    <th>أيام العمل المحسوبة</th>
-                    <th>إجمالي المستحق</th>
-                    <th>إدارة</th>
-                </tr>
-            </thead>
-            <tbody id="reportTableBody">
-                <!-- سيتم تعبئتها تلقائياً -->
-            </tbody>
-        </table>
+    <!-- قسم عرض تقويم الدوام الشهري والتقرير -->
+    <div class="card" id="printSection">
+        <h3>سجل الدوام التقويمي الشهري</h3>
+        
+        <div class="controls-row no-print">
+            <div style="flex: 1;">
+                <label for="selectWorker">اختر العامل:</label>
+                <select id="selectWorker" onchange="renderCalendar()"></select>
+            </div>
+            <div style="flex: 1;">
+                <label for="selectMonth">الشهر والسنة:</label>
+                <input type="month" id="selectMonth" onchange="renderCalendar()">
+            </div>
+        </div>
+
+        <!-- تفاصيل التقرير التي تظهر في الطباعة أيضاً -->
+        <div id="reportHeader" style="margin-bottom: 15px; display: none;">
+            <h4>العامل: <span id="lblWorkerName" style="color: var(--accent-color);"></span> | الشهر: <span id="lblMonth"></span></h4>
+        </div>
+
+        <!-- شبكة تقويم الشهر -->
+        <div class="calendar-grid" id="calendarGrid"></div>
+
+        <!-- ملخص الحسابات للشهر -->
+        <div class="summary-box">
+            <div>أيام الحضور: <span id="sumPresent" style="color: #15803d;">0</span> يوم</div>
+            <div>أيام الغياب: <span id="sumAbsent" style="color: #b91c1c;">0</span> يوم</div>
+            <div>الأجر اليومي: <span id="sumWage">0</span></div>
+            <div>إجمالي المستحق: <span id="sumTotal" style="color: var(--accent-color);">0</span></div>
+        </div>
+
+        <button class="btn btn-print no-print" onclick="window.print()">طباعة التقرير الشهري 🖨️</button>
     </div>
 </div>
 
 <script>
-    // تحميل البيانات من الذاكرة المحلية أو البدء بمصفوفات فارغة
-    let workers = JSON.parse(localStorage.getItem('workers')) || [];
-    let attendance = JSON.parse(localStorage.getItem('attendance')) || [];
+    let workers = JSON.parse(localStorage.getItem('elhasan_workers')) || [];
+    let attendance = JSON.parse(localStorage.getItem('elhasan_attendance')) || {};
 
-    // تعيين تاريخ اليوم افتراضياً في حقل التاريخ
-    document.getElementById('recordDate').valueAsDate = new Date();
+    // ضبط الشهر الحالي تلقائياً
+    const today = new Date();
+    const currentMonthStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0');
+    document.getElementById('selectMonth').value = currentMonthStr;
 
     function saveData() {
-        localStorage.setItem('workers', JSON.stringify(workers));
-        localStorage.setItem('attendance', JSON.stringify(attendance));
+        localStorage.setItem('elhasan_workers', JSON.stringify(workers));
+        localStorage.setItem('elhasan_attendance', JSON.stringify(attendance));
     }
 
     function addWorker() {
@@ -164,86 +304,151 @@
         const wage = parseFloat(document.getElementById('dailyWage').value);
 
         if (!name || isNaN(wage) || wage <= 0) {
-            alert('الرجاء إدخال اسم صحيح وأجر يومي صالح.');
+            alert('يرجى إدخال اسم صحيح وأجر يومي مقبول.');
             return;
         }
 
-        workers.push({ id: Date.now(), name: name, wage: wage });
+        const newId = Date.now().toString();
+        workers.push({ id: newId, name: name, wage: wage });
+        
         document.getElementById('workerName').value = '';
         document.getElementById('dailyWage').value = '';
         
         saveData();
-        updateUI();
-        alert('تمت إضافة العامل بنجاح!');
-    }
-
-    function recordAttendance() {
-        const workerId = document.getElementById('selectWorker').value;
-        const status = parseFloat(document.getElementById('workStatus').value);
-        const date = document.getElementById('recordDate').value;
-
-        if (!workerId || !date) {
-            alert('الرجاء اختيار العامل وتحديد التاريخ.');
-            return;
-        }
-
-        // التحقق إذا تم تسجيل نفس اليوم لنفس العامل مسبقاً لتحديثه بدلاً من تكراره
-        const existingIndex = attendance.findIndex(item => item.workerId == workerId && item.date == date);
-        if (existingIndex > -1) {
-            attendance[existingIndex].status = status;
-        } else {
-            attendance.push({ workerId: workerId, status: status, date: date });
-        }
-
-        saveData();
-        updateUI();
-        alert('تم حفظ الدوام بنجاح!');
+        updateWorkersDropdown();
+        renderCalendar();
     }
 
     function deleteWorker(id) {
-        if (confirm('هل أنت متأكد من حذف هذا العامل وكل سجلات دوامه؟')) {
-            workers = workers.filter(w => w.id != id);
-            attendance = attendance.filter(a => a.workerId != id);
+        if (confirm('هل أنت متأكد من حذف العامل؟ ستفقد جميع سجلات دوامه.')) {
+            workers = workers.filter(w => w.id !== id);
+            delete attendance[id];
             saveData();
-            updateUI();
+            updateWorkersDropdown();
+            renderCalendar();
         }
     }
 
-    function updateUI() {
-        // تحديث قائمة العمال المنسدلة
+    function updateWorkersDropdown() {
         const select = document.getElementById('selectWorker');
+        const listDiv = document.getElementById('workersList');
+        
         select.innerHTML = '';
-        workers.forEach(w => {
-            let option = document.createElement('option');
-            option.value = w.id;
-            option.textContent = w.name;
-            select.appendChild(option);
-        });
+        listDiv.innerHTML = '';
 
-        // تحديث جدول التقارير
-        const tbody = document.getElementById('reportTableBody');
-        tbody.innerHTML = '';
+        if (workers.length === 0) {
+            select.innerHTML = '<option value="">لا يوجد عمال مضافين</option>';
+            listDiv.innerHTML = '<p style="font-size: 13px; color: #888;">لم يتم إضافة عمال بعد.</p>';
+            return;
+        }
 
         workers.forEach(w => {
-            // حساب مجموع أيام العمل لهذا العامل
-            const workerRecords = attendance.filter(a => a.workerId == w.id);
-            const totalDays = workerRecords.reduce((sum, record) => sum + record.status, 0);
-            const totalAmount = totalDays * w.wage;
+            // القائمة المنسدلة
+            let opt = document.createElement('option');
+            opt.value = w.id;
+            opt.textContent = `${w.name} (${w.wage} / يوم)`;
+            select.appendChild(opt);
 
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${w.name}</td>
-                <td>${w.wage}</td>
-                <td>${totalDays}</td>
-                <td>${totalAmount}</td>
-                <td><button class="danger-btn" onclick="deleteWorker(${w.id})">حذف</button></td>
+            // قائمة الإدارة في الكارت
+            let item = document.createElement('div');
+            item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: white; padding: 6px 10px; border-radius: 4px;';
+            item.innerHTML = `
+                <span><strong>${w.name}</strong> - ${w.wage}</span>
+                <button class="btn btn-danger" onclick="deleteWorker('${w.id}')">حذف</button>
             `;
-            tbody.appendChild(tr);
+            listDiv.appendChild(item);
         });
     }
 
-    // تشغيل التحديث عند فتح الصفحة
-    updateUI();
+    function toggleDayStatus(workerId, dateStr) {
+        if (!attendance[workerId]) attendance[workerId] = {};
+        
+        const current = attendance[workerId][dateStr] || 'none';
+        let next = 'present'; // التبديل: لا شيء -> حاضر (1) -> نصف يوم (0.5) -> غائب (0) -> لا شيء
+
+        if (current === 'none') next = 'present';
+        else if (current === 'present') next = 'half';
+        else if (current === 'half') next = 'absent';
+        else if (current === 'absent') next = 'none';
+
+        if (next === 'none') {
+            delete attendance[workerId][dateStr];
+        } else {
+            attendance[workerId][dateStr] = next;
+        }
+
+        saveData();
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        const workerId = document.getElementById('selectWorker').value;
+        const monthStr = document.getElementById('selectMonth').value;
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        if (!workerId || !monthStr) {
+            grid.innerHTML = '<p style="grid-column: span 7; text-align: center;">يرجى اختيار عامل وشهر للعرض.</p>';
+            return;
+        }
+
+        const worker = workers.find(w => w.id === workerId);
+        document.getElementById('reportHeader').style.display = 'block';
+        document.getElementById('lblWorkerName').textContent = worker ? worker.name : '';
+        document.getElementById('lblMonth').textContent = monthStr;
+
+        const [year, month] = monthStr.split('-').map(Number);
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        let countPresent = 0;
+        let countAbsent = 0;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayFormatted = String(day).padStart(2, '0');
+            const dateKey = `${monthStr}-${dayFormatted}`;
+            const status = (attendance[workerId] && attendance[workerId][dateKey]) ? attendance[workerId][dateKey] : 'none';
+
+            const dayBox = document.createElement('div');
+            dayBox.className = 'day-box';
+            
+            let statusText = 'غير محدد';
+            if (status === 'present') {
+                dayBox.classList.add('day-present');
+                statusText = 'حاضر (1)';
+                countPresent += 1;
+            } else if (status === 'half') {
+                dayBox.classList.add('day-half');
+                statusText = 'نصف يوم';
+                countPresent += 0.5;
+            } else if (status === 'absent') {
+                dayBox.classList.add('day-absent');
+                statusText = 'غائب';
+                countAbsent += 1;
+            }
+
+            dayBox.innerHTML = `
+                <span class="num">${day}</span>
+                <span class="status-lbl">${statusText}</span>
+            `;
+
+            // عند الضغط على اليوم يتم تغيير حالته تلقائياً
+            dayBox.onclick = () => toggleDayStatus(workerId, dateKey);
+            grid.appendChild(dayBox);
+        }
+
+        // تحديث ملخص الحسابات
+        const wage = worker ? worker.wage : 0;
+        const totalAmount = countPresent * wage;
+
+        document.getElementById('sumPresent').textContent = countPresent;
+        document.getElementById('sumAbsent').textContent = countAbsent;
+        document.getElementById('sumWage').textContent = wage;
+        document.getElementById('sumTotal').textContent = totalAmount;
+    }
+
+    // بداية التشغيل
+    updateWorkersDropdown();
+    renderCalendar();
 </script>
 
 </body>
